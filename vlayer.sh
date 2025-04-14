@@ -152,7 +152,7 @@ cd "/root/$PROJECT_NAME/vlayer"
 source ~/.bashrc
 
 TIME_FILE=/root/last_prove_time.txt
-INTERVAL=3600 # 每小时执行一次
+INTERVAL=60 # 每1分钟执行一次
 
 while true; do
     CURRENT_TIME=\$(date +%s)
@@ -173,7 +173,7 @@ while true; do
         echo \$CURRENT_TIME > \"\$TIME_FILE\"
     fi
 
-    sleep 600
+    sleep 30
 done
 INNER_EOF
 
