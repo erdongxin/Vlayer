@@ -190,6 +190,9 @@ main() {
     install_docker
     setup_container
 
+    
+    # 使用函数导出和并行控制
+    export -f run_vlayer_node  # 导出函数到子shell
     # 控制并发数（使用xargs实现并行控制）
     seq 1 $NODE_COUNT | xargs -P 2 -I {} bash -c "run_vlayer_node {}"
     
