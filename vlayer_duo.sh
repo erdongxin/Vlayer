@@ -165,7 +165,7 @@ main() {
     # 并行启动所有节点
     for i in $(seq 1 $NODE_COUNT); do
         run_vlayer_node $i &
-        sleep(60)
+        sleep 60
     done
     wait # 等待所有后台任务完成
 
