@@ -170,7 +170,7 @@ EOF
         cat > /root/run_prove.sh <<'SCRIPT_EOF'
 #!/bin/bash
 while true; do
-    cd \"/root/$PROJECT_NAME/vlayer\"
+    cd \"/root/projects/${project_name}/vlayer\"  # 唯一项目路径
     echo \"[Node ${node_num}] 运行证明任务: \$(date)\" >> /root/prove.log
     bun run prove:testnet >> /root/prove.log 2>&1
     sleep \$((240 + RANDOM % 60)) # 随机4-5分钟运行一次
