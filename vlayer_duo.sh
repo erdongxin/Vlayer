@@ -174,3 +174,5 @@ main() {
         echo -e "${YELLOW}tail -f $HOME/prove-node${i}.log${RESET}"
     done
 }
+
+main
