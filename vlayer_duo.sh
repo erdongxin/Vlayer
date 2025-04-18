@@ -8,10 +8,9 @@ YELLOW='\033[33m'
 RESET='\033[0m'
 
 # 容器数量配置
-DEBUG=true
 NODE_COUNT=10
 UBUNTU_IMAGE="ubuntu:24.04"
-PROJECT_NAME="1"
+BASE_PROJECT_NAME="vlayer-project"  # 基础项目名称
 
 check_env() {
     # 检查所有节点的环境变量
@@ -76,7 +75,9 @@ setup_container() {
 run_vlayer_node() {
     local node_num=$1
     local container_name="vlayer-node${node_num}"
+    local project_name="${BASE_PROJECT_NAME}-${node_num}"  # 唯一项目名称
     local log_file="$HOME/prove-node${node_num}.log"
+    
     local token_var="VLAYER_API_TOKEN${node_num}"
     local key_var="EXAMPLES_TEST_PRIVATE_KEY${node_num}"
 
@@ -96,6 +97,9 @@ run_vlayer_node() {
     echo -e "${YELLOW}在 ${container_name} 中执行初始化...${RESET}"
     docker exec "$container_name" /bin/bash -c "
         set -e
+        # 清理可能存在的旧项目
+        rm -rf \"\$HOME/${BASE_PROJECT_NAME}-*\" 2>/dev/null || true
+        
         apt update -y && apt upgrade -y
         apt install -y curl git unzip
 
@@ -114,20 +118,15 @@ run_vlayer_node() {
         curl -fsSL https://bun.sh/install | bash
         export PATH=\"\$HOME/.bun/bin:\$PATH\"
 
-        # 安装Vlayer（增加环境加载）
-        for retry in {1..5}; do
-            echo \"第\${retry}次尝试安装vlayer...\"
-            if curl -SL https://install.vlayer.xyz | bash; then
-                echo \"vlayer安装成功\"
-                # 关键修复：立即加载环境变量
-                source \"\$HOME/.bashrc\"
-                export PATH=\"\$HOME/.vlayer/bin:\$PATH\"
-                break
-            else
-                echo \"安装失败，10秒后重试...\"
-                sleep 10
-            fi
-        done
+        # 安装 Vlayer
+        curl -SL https://install.vlayer.xyz | bash
+        \$HOME/.vlayer/bin/vlayerup
+
+        # 初始化唯一项目目录
+        mkdir -p \"\$HOME/projects\"
+        cd \"\$HOME/projects\"
+        vlayer init \"${project_name}\" --template simple-web-proof  # 使用唯一项目名
+        cd \"${project_name}\"
 
         # 配置 Git
         git config --global user.name 'node${node_num}'
