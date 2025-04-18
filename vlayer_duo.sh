@@ -201,8 +201,8 @@ main() {
     # 并行启动所有节点
     for i in $(seq 1 $NODE_COUNT); do
         run_vlayer_node $i &
-        echo -e "${YELLOW}等待10秒启动下一个节点...${RESET}"
-        sleep 10
+        echo -e "${YELLOW}5秒后启动下一个节点...${RESET}"
+        sleep 5
     done
     wait # 等待所有后台任务完成
 
