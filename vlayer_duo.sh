@@ -145,7 +145,7 @@ while true; do
     cd \"/root/$PROJECT_NAME/vlayer\"
     echo \"[Node ${node_num}] 运行证明任务: \$(date)\" >> /root/prove.log
     bun run prove:testnet >> /root/prove.log 2>&1
-    sleep \$((360 + RANDOM % 30)) # 添加随机延迟避免同时运行
+    sleep \$((240 + RANDOM % 60)) # 随机4-5分钟运行一次
 done
 SCRIPT_EOF
 
