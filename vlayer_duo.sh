@@ -114,23 +114,20 @@ run_vlayer_node() {
         curl -fsSL https://bun.sh/install | bash
         export PATH=\"\$HOME/.bun/bin:\$PATH\"
 
-       # 安装 Vlayer（增加重试机制）
+        # 安装Vlayer（增加环境加载）
         for retry in {1..5}; do
             echo \"第\${retry}次尝试安装vlayer...\"
             if curl -SL https://install.vlayer.xyz | bash; then
                 echo \"vlayer安装成功\"
+                # 关键修复：立即加载环境变量
+                source \"\$HOME/.bashrc\"
+                export PATH=\"\$HOME/.vlayer/bin:\$PATH\"
                 break
             else
                 echo \"安装失败，10秒后重试...\"
                 sleep 10
             fi
         done
-
-        # 验证安装
-        if [ ! -f \"\$HOME/.vlayer/bin/vlayerup\" ]; then
-            echo \"vlayer安装失败！\"
-            exit 1
-        fi
 
         # 配置 Git
         git config --global user.name 'node${node_num}'
