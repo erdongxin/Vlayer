@@ -107,41 +107,58 @@ run_vlayer_node() {
         export PATH=\"\$HOME/.cargo/bin:\$HOME/.foundry/bin:\$HOME/.bun/bin:\$HOME/.vlayer/bin:\$PATH\"
 
         # 安装 Rust
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+        echo '安装 Rust...'
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y || { echo '错误：Rust 安装失败'; exit 1; }
         source \$HOME/.cargo/env
 
         # 安装 Foundry
-        curl -L https://foundry.paradigm.xyz | bash
+        echo '安装 Foundry...'
+        curl -L https://foundry.paradigm.xyz | bash || { echo '错误：Foundry 安装失败'; exit 1; }
         \$HOME/.foundry/bin/foundryup
 
         # 安装 Bun
-        curl -fsSL https://bun.sh/install | bash
-        export PATH=\"\$HOME/.bun/bin:\$PATH\"
+        echo '安装 Bun...'
+        BUN_INSTALL_DIR=\"\$HOME/.bun\"
+        curl -fsSL https://bun.sh/install | bash || { echo '错误：Bun 安装失败！'; exit 1; }
+        export BUN_INSTALL=\"\$BUN_INSTALL_DIR\"
+        export PATH=\"\$BUN_INSTALL/bin:\$PATH\"
+
+        echo '验证 Bun 安装...'
+        if ! command -v bun > /dev/null; then
+            echo '错误：Bun 未正确安装！尝试使用绝对路径...'
+            if [ -f \"\$BUN_INSTALL/bin/bun\" ]; then
+                echo '检测到 Bun 的绝对路径，将手动添加到 PATH'
+                export PATH=\"\$BUN_INSTALL/bin:\$PATH\"
+            else
+                echo '错误：Bun 未找到'; exit 1
+            fi
+        fi
+        echo 'Bun 版本：' \$(bun --version)
 
         # 安装 Vlayer
-        curl -SL https://install.vlayer.xyz | bash
+        echo '安装 vlayer...'
+        curl -SL https://install.vlayer.xyz | bash || { echo '错误：vlayer 安装失败'; exit 1; }
         \$HOME/.vlayer/bin/vlayerup
-
-        # 初始化唯一项目目录
-        mkdir -p \"\$HOME/projects\"
-        cd \"\$HOME/projects\"
-        vlayer init \"${project_name}\" --template simple-web-proof  # 使用唯一项目名
-        cd \"${project_name}\"
 
         # 配置 Git
         git config --global user.name 'node${node_num}'
         git config --global user.email 'node${node_num}@example.com'
 
         # 初始化项目
-        vlayer init \"$PROJECT_NAME\" --template simple-web-proof
-        cd \"$PROJECT_NAME\"
-        forge build
+        cd \"\$HOME/projects\"
+        vlayer init \"${project_name}\" --template simple-web-proof || { echo '错误：vlayer 初始化失败'; exit 1; }
 
-        # 配置项目依赖
+        # 构建
+        echo '构建项目...'
+        cd \"${project_name}\"
+        forge build || { echo '错误：forge build 失败'; exit 1; }
+
+        # 安装bun项目依赖
         cd vlayer
         bun install
 
         # 生成环境文件
+        echo '生成 .env.testnet.local...'
         cat > .env.testnet.local <<EOF
 VLAYER_API_TOKEN=\$VLAYER_API_TOKEN
 EXAMPLES_TEST_PRIVATE_KEY=\$EXAMPLES_TEST_PRIVATE_KEY
@@ -172,7 +189,7 @@ main() {
     install_docker
     setup_container
 
-    # 改为串行启动，每个节点间隔30秒
+    # 串行启动，每个节点间隔30秒
     for i in $(seq 1 $NODE_COUNT); do
         run_vlayer_node $i
         echo -e "${YELLOW}等待30秒启动下一个节点...${RESET}"
