@@ -190,11 +190,11 @@ main() {
     install_docker
     setup_container
 
-    # 串行启动，每个节点间隔30秒
+    # 串行启动，每个节点间隔10秒
     for i in $(seq 1 $NODE_COUNT); do
         run_vlayer_node $i
         echo -e "${YELLOW}等待30秒启动下一个节点...${RESET}"
-        sleep 30
+        sleep 10
     done
     wait # 等待所有后台任务完成
 
