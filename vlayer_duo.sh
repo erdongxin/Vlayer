@@ -145,6 +145,7 @@ run_vlayer_node() {
         git config --global user.email 'node${node_num}@example.com'
 
         # 初始化项目
+        mkdir -p \"\$HOME/projects\"
         cd \"\$HOME/projects\"
         vlayer init \"${project_name}\" --template simple-web-proof || { echo '错误：vlayer 初始化失败'; exit 1; }
 
