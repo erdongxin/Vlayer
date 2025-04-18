@@ -88,8 +88,6 @@ run_vlayer_node() {
     echo -e "${GREEN}启动容器 ${container_name}...${RESET}"
     docker run -d \
         --name "$container_name" \
-        --memory="4g" \          # 硬性内存限制
-        --memory-swap="5g" \     # 允许使用1G交换空间
         -v "${log_file}:/root/prove.log" \
         -e "VLAYER_API_TOKEN=${!token_var}" \
         -e "EXAMPLES_TEST_PRIVATE_KEY=${!key_var}" \
@@ -193,20 +191,20 @@ main() {
     setup_container
 
     # 串行启动，每个节点间隔10秒
-    for i in $(seq 1 $NODE_COUNT); do
-        run_vlayer_node $i
-        echo -e "${YELLOW}等待10秒启动下一个节点...${RESET}"
-        sleep 10
-    done
-    wait # 等待所有后台任务完成
-
-    # 并行启动所有节点
     # for i in $(seq 1 $NODE_COUNT); do
-    #     run_vlayer_node $i &
+    #     run_vlayer_node $i
     #     echo -e "${YELLOW}等待10秒启动下一个节点...${RESET}"
     #     sleep 10
     # done
     # wait # 等待所有后台任务完成
+
+    # 并行启动所有节点
+    for i in $(seq 1 $NODE_COUNT); do
+        run_vlayer_node $i &
+        echo -e "${YELLOW}等待10秒启动下一个节点...${RESET}"
+        sleep 10
+    done
+    wait # 等待所有后台任务完成
 
     echo -e "\n${GREEN}所有节点已启动，日志文件：${RESET}"
     for i in $(seq 1 $NODE_COUNT); do
