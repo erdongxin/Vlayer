@@ -8,7 +8,7 @@ YELLOW='\033[33m'
 RESET='\033[0m'
 
 # 容器数量配置
-NODE_COUNT=10
+NODE_COUNT=5
 UBUNTU_IMAGE="ubuntu:24.04"
 BASE_PROJECT_NAME="vlayer-project"  # 基础项目名称
 
