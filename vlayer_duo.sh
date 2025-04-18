@@ -88,6 +88,8 @@ run_vlayer_node() {
     echo -e "${GREEN}启动容器 ${container_name}...${RESET}"
     docker run -d \
         --name "$container_name" \
+        --memory="4g" \          # 硬性内存限制
+        --memory-swap="5g" \     # 允许使用1G交换空间
         -v "${log_file}:/root/prove.log" \
         -e "VLAYER_API_TOKEN=${!token_var}" \
         -e "EXAMPLES_TEST_PRIVATE_KEY=${!key_var}" \
