@@ -67,28 +67,16 @@ run_vlayer_node() {
     local key_var="EXAMPLES_TEST_PRIVATE_KEY${node_num}"
 
     # 清理残留容器
-    #docker rm -f "$container_name" 2>/dev/null || true
-    #docker volume ls | grep "vlayer-${node_num}" | awk '{print $2}' | xargs -r docker volume rm
-
-    # 清理旧容器和卷
     docker rm -f "$container_name" 2>/dev/null || true
-    docker volume rm "vlayer-${node_num}-cache" 2>/dev/null || true
-
-    # 创建独立缓存卷（关键修复）
-    if ! docker volume create "vlayer-${node_num}-cache" >/dev/null 2>&1; then
-        echo -e "${RED}无法创建缓存卷 vlayer-${node_num}-cache${RESET}"
-        exit 1
-    fi
+    docker volume ls | grep "vlayer-${node_num}" | awk '{print $2}' | xargs -r docker volume rm
 
     # 启动容器命令优化
     docker run -d \
         --name "$container_name" \
-        --mount type=volume,source=vlayer-${node_num}-cache,target=/root/.cache \
-        --mount type=bind,source="${log_file}",target=/root/prove.log \
+        -v "${log_file}:/root/prove.log" \
         -e "VLAYER_API_TOKEN=${!token_var}" \
         -e "EXAMPLES_TEST_PRIVATE_KEY=${!key_var}" \
-        "$UBUNTU_IMAGE" \
-        sleep infinity
+        $UBUNTU_IMAGE sleep infinity
 
     # 带重试机制的安装过程
     docker exec "$container_name" /bin/bash -c "
