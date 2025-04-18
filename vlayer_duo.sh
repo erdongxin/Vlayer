@@ -114,9 +114,23 @@ run_vlayer_node() {
         curl -fsSL https://bun.sh/install | bash
         export PATH=\"\$HOME/.bun/bin:\$PATH\"
 
-        # 安装 Vlayer
-        curl -SL https://install.vlayer.xyz | bash
-        \$HOME/.vlayer/bin/vlayerup
+       # 安装 Vlayer（增加重试机制）
+        for retry in {1..5}; do
+            echo \"第\${retry}次尝试安装vlayer...\"
+            if curl -SL https://install.vlayer.xyz | bash; then
+                echo \"vlayer安装成功\"
+                break
+            else
+                echo \"安装失败，10秒后重试...\"
+                sleep 10
+            fi
+        done
+
+        # 验证安装
+        if [ ! -f \"\$HOME/.vlayer/bin/vlayerup\" ]; then
+            echo \"vlayer安装失败！\"
+            exit 1
+        fi
 
         # 配置 Git
         git config --global user.name 'node${node_num}'
@@ -162,10 +176,11 @@ main() {
     install_docker
     setup_container
 
-    # 并行启动所有节点
+    # 改为串行启动，每个节点间隔30秒
     for i in $(seq 1 $NODE_COUNT); do
-        run_vlayer_node $i &
-        sleep 60
+        run_vlayer_node $i
+        echo -e "${YELLOW}等待30秒启动下一个节点...${RESET}"
+        sleep 30
     done
     wait # 等待所有后台任务完成
 
