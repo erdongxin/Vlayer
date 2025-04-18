@@ -1,4 +1,4 @@
-# 单机启动说明
+# 单号启动说明
 
 ## 1、手动配置环境变量
 export VLAYER_API_TOKEN=ey..  
