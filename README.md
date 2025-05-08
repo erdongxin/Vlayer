@@ -1,4 +1,6 @@
-# 单号启动说明(参考华佬sdohuajia脚本改造)
+# 声明：参考华佬sdohuajia脚本改造   
+
+## 单号启动说明
 
 ## 1、手动配置环境变量
 export VLAYER_API_TOKEN=ey..  
@@ -10,7 +12,7 @@ curl -O https://raw.githubusercontent.com/erdongxin/Vlayer/refs/heads/main/vlaye
 ## 3、查看日志
 tail -f /root/prove.log
 
-# 多号启动说明（每个镜像大约需要6G空间），默认启动5个
+## 多号启动说明（每个镜像大约需要6G空间），默认启动5个
 
 ## 1、手动配置环境变量，要启动多少个就配多少个
 export VLAYER_API_TOKEN1="your_token_1"  
